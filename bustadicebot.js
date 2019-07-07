@@ -1,32 +1,55 @@
 var config = {
-    wager: { label: "Wager", type: "balance", value: 100 },
-    target: { label: "Target", type: "multiplier", value: 1.20 }
-  };
-  var base=config.target.value;
-  var basebet=config.wager.value;
-  var sayac=0;
+  baseBet: { value: 20, type: 'balance', label: 'base bet' },
+  payout: { value: 2.60, type: 'multiplier' },
+  max: { value: 1e8, type: 'balance', label: 'Max bet' },
+
+};
 
 
+log('Script is running..');
 
-    while (true) {
-        const { multiplier } = await this.bet(config.wager.value, config.target.value)
-        if (multiplier >= config.target.value) {
-            config.wager.value=basebet;
-            config.target.value= base
-            sayac=0;
-        }else{
-          if(sayac<2){
-            config.wager.value=config.wager.value*4;
-            config.target.value=config.target.value+0.09
-            sayac++;
-          }else if(sayac<4) {
-            sayac++;
-            config.wager.value=config.wager.value*4;
-            }else{
-                sayac=0;
-                config.wager.value=basebet;
-                config.target.value=bet;
-            }
-          }
-            
-    }
+var currentBet = config.baseBet.value;
+var count = 0;
+
+// Always try to bet when script is started
+
+
+setTimeout(function start(){
+    engine.bet(roundBit(currentBet), config.payout.value);
+    engine.on('GAME_STARTING', onGameStarted);
+    engine.on('GAME_ENDED', onGameEnded);
+}, 1000 );
+
+
+function onGameStarted() { 
+    engine.bet(roundBit(currentBet), config.payout.value);
+  }
+
+function onGameEnded() {
+  var lastGame = engine.history.first()
+
+  // If we wagered, it means we played
+  if (!lastGame.wager) {
+    return;
+  }
+
+  // we won..
+  if (lastGame.cashedAt) {
+      currentBet = config.baseBet.value;
+      count =0;
+    log('count = ' , count );
+  } else {
+  currentBet=currentBet*2;
+  
+    log('We lost, so next bet will be', currentBet/100, 'bits')
+
+  }
+
+  if (currentBet > config.max.value) {
+    currentBet = config.baseBet.value;
+  }
+}
+
+function roundBit(bet) {
+  return Math.round(bet / 100) * 100;
+}
