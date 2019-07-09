@@ -44,20 +44,19 @@ function onGameEnded() {
       currentBet = config.baseBet.value;
       count++;
       log('count = ' , count );
-    } else if(count == 2){
+    } else if(count == 3){
        count++;
 
       currentBet = config.baseBet.value * 10;
       log('count = ' , count );
     }
- else if(count == 3){
+ else if(count == 4){
     count++;
 
    currentBet = config.baseBet.value * 25;
    log('count = ' , count );
  }
-else if(count ==11){
-count=0}
+
     else {
         count++;
         currentBet= currentBet * 2;
