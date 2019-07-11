@@ -57,7 +57,7 @@ function onGameEnded() {
 
   }
 
-  if (currentBet > config.max.value) {
+  if (currentBet => config.max.value) {
     currentBet = config.baseBet.value;
   }
 }
